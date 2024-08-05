@@ -1,4 +1,6 @@
 
+from datetime import datetime
+import time
 import pandas as pd
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
@@ -77,6 +79,8 @@ if submit:
                 "Name": name,
                 "Surname": surname,
                 "Email": email,
+                "OrderDate": datetime.today().strftime('%Y-%m-%d'),
+                "OrderTime": time.strftime("%H:%M:%S", time.localtime()),
                 "Product": selected_product,
                 "OrderQty": str(selected_qty),
                 "TotalPrice": str(total_price)
