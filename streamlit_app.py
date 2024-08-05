@@ -6,7 +6,9 @@ import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 
 
-# example/st_app.py
+#setting up the page
+st.set_page_config(page_title="Warehouse Stock Sale",page_icon=":money_mouth_face:")
+st.title("Warehouse Stock Sale")
 
 conn = st.connection("gsheets", type=GSheetsConnection)
 data = conn.read(worksheet="Products")
