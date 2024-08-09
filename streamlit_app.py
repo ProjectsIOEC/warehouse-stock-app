@@ -7,63 +7,69 @@ from streamlit_gsheets import GSheetsConnection
 
 
 #setting up the page
-st.set_page_config(page_title="Warehouse Stock Sale",page_icon=":money_mouth_face:")
+st.set_page_config(page_title="Warehouse Stock Sale")
 st.title("Warehouse Stock Sale")
 
 conn = st.connection("gsheets", type=GSheetsConnection)
 data = conn.read(worksheet="Products")
 orders_existing_data = conn.read(worksheet="Orders")
 
+dt = data["Description"] + data["Price"].astype(str)
 
 #st.dataframe(orders_existing_data)
 #st.dataframe(data)
 
-
-
 #Creating a form
 st.subheader("User information")
 
-name = st.text_input("Name", max_chars=50)
-surname = st.text_input("Surname", max_chars=50)
+name = st.text_input("Name & Surname", max_chars=80)
 email = st.text_input("Email", max_chars=50)
 emp_number = st.text_input("Employee Number", max_chars=10)
 
 st.subheader("Select Product")
 
+
 selected_product = st.selectbox(
     "Available Products",
-    (data["Description"]),
+    (
+        data["Description"] + " - R " + round((data["Price"] * 1.15), 2).astype(str)
+    ),
 )
 
+selected_prod_str = str(selected_product).split(" - R ")
 
-qty = f"""SELECT "Qty" FROM Products WHERE Description = '{selected_product}'"""
-price = f"""SELECT "Price" FROM Products WHERE Description = '{selected_product}'"""
+#st.write(selected_prod_str)
+
+qty = f"""SELECT "AvailableQty" FROM Products WHERE Description = '{selected_prod_str[0]}'"""
+price = f"""SELECT "Price" FROM Products WHERE Description = '{selected_prod_str[0]}'"""
 
 
 qty_df = conn.query(sql=qty, ttl=3600)
 price = conn.query(sql=price, ttl=3600)
 
 
-selected_qty = st.number_input("Select Quantity", min_value=1, max_value=int(qty_df["Qty"]))
+selected_qty = st.number_input("Select Quantity", min_value=0, max_value=int(qty_df["AvailableQty"]))
 
-total_price = float(price["Price"]) * selected_qty
+total_price = round((float(price["Price"]) * selected_qty) * 1.15, 2)
 
+if (int(qty_df["AvailableQty"] > 0)):
+    st.write(selected_product)
+    st.text("Total Qty Available: " + int(qty_df["AvailableQty"]).__str__())
+    st.text("Total Price: R " + str(total_price) + " (Incl VAT)")
+else:
+    st.write(selected_product)
+    st.markdown("**Product not available**")
 
-st.write(selected_product)
-st.text("Total Qty Available: " + int(qty_df["Qty"]).__str__())
-st.text("Total Price: R " + str(total_price))
-
+#new_qty = (int(qty_df["Qty"])-selected_qty)
+#st.write(new_qty)
+#st.write()
 
 submit = st.button("Place Order")
-
 
 if submit:
 
     if not name:
         st.warning("Please input your name!!! :pleading_face:")
-        st.stop()
-    if not surname:
-        st.warning("Please input your surname!!! :pleading_face:")
         st.stop()
     if not email:
         st.warning("Please input your email!!! :pleading_face:")
@@ -71,6 +77,10 @@ if submit:
     if not emp_number:
         st.warning("Please input your employee number!!! :pleading_face:")
         st.stop()
+    if (int(qty_df["AvailableQty"] <= 0)):
+        st.warning("Product not available:disappointed:")
+        st.stop()
+
 
     st.cache_data.clear()
 
@@ -79,11 +89,10 @@ if submit:
             {
                 "EmpNumber": emp_number,
                 "Name": name,
-                "Surname": surname,
                 "Email": email,
                 "OrderDate": datetime.today().strftime('%Y-%m-%d'),
                 "OrderTime": time.strftime("%H:%M:%S", time.localtime()),
-                "Product": selected_product,
+                "Product": selected_prod_str[0],
                 "OrderQty": str(selected_qty),
                 "TotalPrice": str(total_price)
             }
