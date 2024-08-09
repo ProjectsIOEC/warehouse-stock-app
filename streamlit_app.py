@@ -1,10 +1,14 @@
 
+from datetime import datetime
+import time
 import pandas as pd
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 
 
-# example/st_app.py
+#setting up the page
+st.set_page_config(page_title="Warehouse Stock Sale",page_icon=":money_mouth_face:")
+st.title("Warehouse Stock Sale")
 
 conn = st.connection("gsheets", type=GSheetsConnection)
 data = conn.read(worksheet="Products")
@@ -77,6 +81,8 @@ if submit:
                 "Name": name,
                 "Surname": surname,
                 "Email": email,
+                "OrderDate": datetime.today().strftime('%Y-%m-%d'),
+                "OrderTime": time.strftime("%H:%M:%S", time.localtime()),
                 "Product": selected_product,
                 "OrderQty": str(selected_qty),
                 "TotalPrice": str(total_price)
