@@ -4,6 +4,15 @@ import time
 import pandas as pd
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
+import re
+
+#Checking If Email is Valid using RegEx
+def check(email_str):
+    pat = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
+    if re.match(pat,email_str):
+        return True
+    else:
+        return False
 
 
 #setting up the page
@@ -23,11 +32,11 @@ dt = data["Description"] + data["Price"].astype(str)
 st.subheader("User information")
 
 name = st.text_input("Name & Surname", max_chars=80)
-email = st.text_input("Email", max_chars=50)
+email = st.text_input("Email", max_chars=50, placeholder="someone@gmail.com")
+
 emp_number = st.text_input("Employee Number", max_chars=10)
 
 st.subheader("Select Product")
-
 
 selected_product = st.selectbox(
     "Available Products",
@@ -80,7 +89,9 @@ if submit:
     if (int(qty_df["AvailableQty"] <= 0)):
         st.warning("Product not available:disappointed:")
         st.stop()
-
+    if(not check(email)):
+       st.warning("Please enter correct email address")
+       st.stop()
 
     st.cache_data.clear()
 
