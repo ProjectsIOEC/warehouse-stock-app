@@ -90,7 +90,7 @@ if submit:
         st.warning("Product not available:disappointed:")
         st.stop()
     if(not check(email)):
-       st.warning("Please enter correct email address")
+       st.warning("Please enter a valid email address")
        st.stop()
 
     st.cache_data.clear()
