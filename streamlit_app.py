@@ -21,7 +21,7 @@ st.title("Warehouse Stock Sale")
 
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
-st.info(f'Note:\n:red[Once an order is placed it cannot be cancelled.]\nBB dates can be better than ones provided.')
+st.info(f'Note:\n:red[Once an order is placed it cannot be cancelled.]\nBB dates can be better than ones provided. :red[Stock is not for Resale.]')
 
 #Checking If Email is Valid using RegEx
 def check(email_str):
