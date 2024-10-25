@@ -72,7 +72,7 @@ if selected == "Place Order":
     selected_product = st.selectbox(
         "Available Products",
         (
-            data["Description"] + " - R " + round((data["Price"] * 1.15), 2).astype(str)
+            data["Description"] + " - R " + round((data["Price"] * 1.0), 2).astype(str)
         ),
     )
 
@@ -90,7 +90,7 @@ if selected == "Place Order":
 
     selected_qty = st.number_input("Select Quantity", min_value=0, max_value=int(qty_df["AvailableQty"]))
 
-    total_price = round((float(price["Price"]) * selected_qty) * 1.15, 2)
+    total_price = round((float(price["Price"]) * selected_qty) * 1.0, 2)
 
     if (int(qty_df["AvailableQty"] > 0)):
         st.write(selected_product)
